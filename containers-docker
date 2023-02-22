@@ -1,0 +1,22 @@
+
+##### PostgreSql#####
+	### AUTENTICAÇÂO
+		docker run --name auth-db -p 5436:5432 -e POSTGRES_DB=auth-db -e POSTGRES_USER=admin -e POSTGRES_PASSWORD=123456 postgres:11
+	
+	### Produtos ###
+		docker run --name product-db -p 5435:5432 -e POSTGRES_DB=product-db -e POSTGRES_USER=admin -e POSTGRES_PASSWORD=123456 postgres:11
+
+
+
+
+#### MONGO DB ####
+	docker run --name sales-db -p 27017:27017 -p 28017:28017 -e MONGO_USER="admin" -e MONGODB_DATABASE="sales" -e MONGODB_PASS="123456" tutum/mongodb
+	Acessar mongo db: mongo mongodb://admin:123456@localhost:27017/sales
+	
+### RABBIT MQ ####
+
+	docker run --name sales_rabbit -p 5672:5672 -p 25676:25676 -p 15672:15672 rabbitmq:3-management
+	acessar: localhots:15672
+		username: guest
+		senha: guest
+		

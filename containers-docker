@@ -20,3 +20,40 @@
 		username: guest
 		senha: guest
 		
+		
+### BUild das imagens#####
+	
+	Apos criar o arquivo Dockerfile na raiz do projeto, digitar os seguintes comandos:
+	
+	- Criar imagem de AUTH-API:   docker build -t auth-api_image .
+	- Criar imagem de SALES-API:   docker build -t sales-api_image .
+	- Criar imagem de PRODUCT-API:   docker build -t product-api_image .
+
+## CRIAR OS CONTAINERS ###
+	
+	- Criar container de AUTH-API: docker run --name auth-api_container -p 8080:8080 auth-api_image 
+	- Criar container de SALES-API: docker run --name sales-api_container -p 8080:8080 sales-api_image 
+	- Criar container de PRODUCT-API: docker run --name product-api_container -p 8080:8080 product-api_image 
+
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	

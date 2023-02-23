@@ -3,7 +3,7 @@ import express from "express";
 const app = express();
 
 const env = process.env;
-const PORT = env.port || 8080;
+const PORT = env.port || 8085;
 
 
 app.get("/api/status",(req, res) => {

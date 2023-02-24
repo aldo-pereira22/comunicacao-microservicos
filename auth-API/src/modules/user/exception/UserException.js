@@ -1,3 +1,5 @@
+
+
 class UserException extends Error {
     constructor(status, message){
         super(message);
@@ -9,4 +11,4 @@ class UserException extends Error {
     }
 }
 
-module.exports = UserException
+export default UserException

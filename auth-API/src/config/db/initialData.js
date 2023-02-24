@@ -5,6 +5,7 @@ import User from "../../modules/user/model/User.js"
 let password = await bcrypt.hash('123456', 10)
 
 export  async function createInitialdata(){
+    console.log("Criando Dados\n")
     try {
         await User.sync({force: true})
     
@@ -33,5 +34,5 @@ export  async function createInitialdata(){
     } catch (error) {
             console.log(error)
     }
-
+    console.log('\n Dados criados com sucesso!')
 }

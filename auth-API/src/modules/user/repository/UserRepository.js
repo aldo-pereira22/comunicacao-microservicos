@@ -1,4 +1,4 @@
-import User from "../model/User";
+import User from "../model/User.js";
 
 class UserRepository{
 
@@ -15,9 +15,13 @@ class UserRepository{
 
     async findByEmail(email) {
         try {
-            return await User.findOne({where: email})
+            return await User.findOne({
+                where: {
+                    email
+                } 
+            })
         } catch (error) {
-            console.error("Erro ao pesquisar email: ", error.message);
+            console.error("\n\n\n\Erro ao pesquisar: ", error.message);
             return null
         }
     }

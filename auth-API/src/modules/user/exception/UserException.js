@@ -7,7 +7,7 @@ class UserException extends Error {
         this.message  = message;
         this.name = this.constructor.name;
 
-        Error.captureStackTrace(this.constructor)
+        Error.captureStackTrace(this,this.constructor)
     }
 }
 

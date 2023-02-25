@@ -21,7 +21,7 @@ class UserRepository{
                 } 
             })
         } catch (error) {
-            console.error("\n\n\n\Erro ao pesquisar: ", error.message);
+       
             return null
         }
     }

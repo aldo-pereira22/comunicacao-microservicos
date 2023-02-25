@@ -28,9 +28,9 @@ export default async  (req, res, next) => {
     } catch (err) {
         const status = err.status ? err.status : httpStatus.INTERNAL_SERVER_ERROR;
         // return res.status(status).json({ status, message: err.message });
-        return  res.status(error.status).json({
+        return  res.status(err.status).json({
             status: httpStatus.UNAUTHORIZED,
-            message: error.message
+            message: err.message
         })
     }
 }

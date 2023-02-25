@@ -4,7 +4,7 @@ class UserController {
     async getAccessToken(req, res){
         let accessToken = await UserService.getAccessToken(req)
         console.log(accessToken)
-        return res.status(accessToken.stauts).json(accessToken.accessToken)
+        return res.status(accessToken.status).json(accessToken.accessToken)
 
     }
     

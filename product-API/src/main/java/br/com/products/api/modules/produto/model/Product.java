@@ -29,4 +29,7 @@ public class Product  {
     private Category category;
 
 
+    @Column(name = "QUANTITY_AVAILABLE", nullable = false)
+    private Integer quantityAvailable;
+
 }

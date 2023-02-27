@@ -1,8 +1,10 @@
 package br.com.products.api.modules.category.dto;
 
 import br.com.products.api.modules.category.model.Category;
+import lombok.Data;
 import org.springframework.beans.BeanUtils;
 
+@Data
 public class CategoryResponse {
     private Integer id;
     private String description;

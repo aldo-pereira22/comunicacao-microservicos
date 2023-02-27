@@ -206,6 +206,15 @@ dist
 .yarn/unplugged
 .yarn/build-state.yml
 .yarn/install-state.gz
+
+
+/home/aldo/cursos/microservices/comunicacao-microservicos/product-API/.gradle/7.6/checksums/checksums.lock
+./product-API/.gradle/7.6/fileHashes/fileHashes.lock
+./product-API/.gradle/7.6/executionHistory/executionHistory.lock
+./product-API/.gradle/7.6/dependencies-accessors/dependencies-accessors.lock
+. product-API/.gradle/7.6/checksums/checksums.lock
+. product-API/.gradle/7.6/fileHashes/fileHashes.lock
+. product-API/.gradle/buildOutputCleanup/buildOutputCleanup.lock
 .pnp.*
 # Android studio 3.1+ serialized cache file
 .idea/caches/build_file_checksums.ser

@@ -1,5 +1,6 @@
 package br.com.products.api.modules.supplier.service;
 
+import br.com.products.api.config.exception.ValidationException;
 import br.com.products.api.modules.category.dto.CategoryRequest;
 import br.com.products.api.modules.category.dto.CategoryResponse;
 import br.com.products.api.modules.category.model.Category;
@@ -19,6 +20,11 @@ public class SupplierService {
     @Autowired
     private SupplierRepository supplierRepository;
 
+    public Supplier findById(Integer id){
+        return supplierRepository
+                .findById(id)
+                .orElseThrow( ()-> new ValidationException("There's no supplier for the given ID"));
+    }
     public SupplierResponse save(SupplierRequest request) {
         validateSupplierNameInformed(request);
         var supplier = supplierRepository.save(Supplier.of(request));

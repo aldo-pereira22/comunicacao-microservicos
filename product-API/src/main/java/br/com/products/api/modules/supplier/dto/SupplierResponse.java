@@ -11,8 +11,8 @@ import org.springframework.beans.BeanUtils;
 public class SupplierResponse {
     private Integer id;
     private String name;
-    private SupplierResponse supplierResponse;
-    private CategoryResponse categoryResponse;
+//    private SupplierResponse supplierResponse;
+//    private CategoryResponse categoryResponse;
 
 
     public static SupplierResponse of(Supplier supplier) {

@@ -30,8 +30,6 @@ public class ProductService {
     private CategoryService categoryService;
 
 
-    @Autowired
-
     public ProductResponse save(ProductRequest request){
         validateProductNotInformed(request);
         validateCategoryAndSupplierInformed(request);

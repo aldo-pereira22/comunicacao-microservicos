@@ -107,4 +107,12 @@ public class ProductService {
             throw new ValidationException("The Product name was not informed!");
         }
     }
+
+    public Boolean existsbyCategoryId(Integer categoryId){
+        return productRepository.existsByCategoryId(categoryId);
+    }
+
+    public Boolean existsBySupplierId(Integer supplierId){
+        return productRepository.existsByCategoryId(supplierId);
+    }
 }

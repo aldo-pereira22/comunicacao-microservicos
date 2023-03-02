@@ -1,5 +1,6 @@
 package br.com.products.api.modules.product.service;
 
+import br.com.products.api.config.exception.SuccessResponse;
 import br.com.products.api.config.exception.ValidationException;
 import br.com.products.api.modules.category.dto.CategoryRequest;
 import br.com.products.api.modules.category.dto.CategoryResponse;
@@ -56,6 +57,18 @@ public class ProductService {
         return ProductResponse.of(product);
 
     }
+    public ProductResponse update(ProductRequest request, Integer id){
+        validateProductNotInformed(request);
+        validateInformedId(id);
+        validateCategoryAndSupplierInformed(request);
+        var category = categoryService.findById(request.getCategoryId());
+        var supplier = supplierService.findById(request.getSupplierId());
+        var product = Product.of(request, supplier, category);
+        product.setId(id);
+        productRepository.save(product);
+        return ProductResponse.of(product);
+
+    }
     public ProductResponse findByIdResponse(Integer id){
         return ProductResponse.of(findById(id));
     }
@@ -88,12 +101,12 @@ public class ProductService {
                 .map(ProductResponse::of)
                 .collect(Collectors.toList());
     }
-    public List<ProductResponse> findByCategoryId(Integer categoryId){
-        if(isEmpty(categoryId)){
+    public List<ProductResponse> findByCategoryId(String name){
+        if(isEmpty(name)){
             throw new ValidationException("The Product Category ID name must be informed");
         }
         return productRepository
-                .findByCategoryId(categoryId)
+                .findByNameIgnoreCaseContaining(name)
                 .stream()
                 .map(ProductResponse::of)
                 .collect(Collectors.toList());
@@ -115,4 +128,18 @@ public class ProductService {
     public Boolean existsBySupplierId(Integer supplierId){
         return productRepository.existsByCategoryId(supplierId);
     }
+    public SuccessResponse delete(Integer id) {
+        validateInformedId(id);
+
+        productRepository.deleteById(id);
+        return SuccessResponse.create("The Product was deleted.");
+
+    }
+
+    private void validateInformedId(Integer id) {
+        if (isEmpty(id)) {
+            throw new ValidationException("The Supplier ID must informed.");
+        }
+    }
+
 }

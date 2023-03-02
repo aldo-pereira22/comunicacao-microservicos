@@ -69,6 +69,14 @@ public class CategoryService {
         var category = categoryRepository.save(Category.of(request));
         return CategoryResponse.of(category);
     }
+    public CategoryResponse update(CategoryRequest request, Integer id) {
+        validateCategoryNameInformed(request);
+        validateInformedId(id);
+        var category = Category.of(request);
+        category.setId(id);
+        categoryRepository.save(category);
+        return CategoryResponse.of(category);
+    }
 
     private void validateCategoryNameInformed(CategoryRequest request){
         if( isEmpty (request.getDescription())){

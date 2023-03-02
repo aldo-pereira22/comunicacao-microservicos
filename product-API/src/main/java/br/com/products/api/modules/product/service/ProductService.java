@@ -9,11 +9,15 @@ import br.com.products.api.modules.product.dto.ProductRequest;
 import br.com.products.api.modules.product.dto.ProductResponse;
 import br.com.products.api.modules.product.model.Product;
 import br.com.products.api.modules.product.repository.ProductRepository;
+import br.com.products.api.modules.supplier.dto.SupplierResponse;
 import br.com.products.api.modules.supplier.model.Supplier;
 import br.com.products.api.modules.supplier.service.SupplierService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 import static org.springframework.util.ObjectUtils.isEmpty;
 
@@ -29,7 +33,20 @@ public class ProductService {
     @Autowired
     private CategoryService categoryService;
 
-
+    public List<ProductResponse> findAll(){
+        return productRepository
+                .findAll()
+                .stream()
+                .map(product -> ProductResponse.of(product))
+                .collect(Collectors.toList());
+    }
+    public  List<ProductResponse> findByname(String name){
+        return productRepository
+                .findByNameIgnoreCaseContaining(name)
+                .stream()
+                .map(product -> ProductResponse.of(product))
+                .collect(Collectors.toList());
+    }
     public ProductResponse save(ProductRequest request){
         validateProductNotInformed(request);
         validateCategoryAndSupplierInformed(request);
@@ -39,8 +56,16 @@ public class ProductService {
         return ProductResponse.of(product);
 
     }
+    public ProductResponse findByIdResponse(Integer id){
+        return ProductResponse.of(findById(id));
+    }
 
 
+    public Product findById(Integer id){
+        return productRepository
+                .findById(id)
+                .orElseThrow( ()-> new ValidationException("There's no Product for the given ID"));
+    }
     private void validateProductNotInformed(ProductRequest request){
         if(isEmpty(request.getName())){
             throw new ValidationException("The category name was not informed!");
@@ -53,13 +78,33 @@ public class ProductService {
         }
     }
 
+    public List<ProductResponse> findBySupplierId(Integer supplierId){
+        if(isEmpty(supplierId)){
+            throw new ValidationException("The Product Supplier ID name must be informed");
+        }
+        return productRepository
+                .findBySupplierId(supplierId)
+                .stream()
+                .map(ProductResponse::of)
+                .collect(Collectors.toList());
+    }
+    public List<ProductResponse> findByCategoryId(Integer categoryId){
+        if(isEmpty(categoryId)){
+            throw new ValidationException("The Product Category ID name must be informed");
+        }
+        return productRepository
+                .findByCategoryId(categoryId)
+                .stream()
+                .map(ProductResponse::of)
+                .collect(Collectors.toList());
+    }
 
     private void validateCategoryAndSupplierInformed(ProductRequest request){
         if(isEmpty(request.getCategoryId())){
-            throw new ValidationException("The category name was not informed!");
+            throw new ValidationException("The Product name was not informed!");
         }
         if(isEmpty(request.getSupplierId())){
-            throw new ValidationException("The category name was not informed!");
+            throw new ValidationException("The Product name was not informed!");
         }
     }
 }

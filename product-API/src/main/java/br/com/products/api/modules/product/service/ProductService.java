@@ -48,6 +48,7 @@ public class ProductService {
                 .map(product -> ProductResponse.of(product))
                 .collect(Collectors.toList());
     }
+
     public ProductResponse save(ProductRequest request){
         validateProductNotInformed(request);
         validateCategoryAndSupplierInformed(request);
@@ -57,6 +58,7 @@ public class ProductService {
         return ProductResponse.of(product);
 
     }
+
     public ProductResponse update(ProductRequest request, Integer id){
         validateProductNotInformed(request);
         validateInformedId(id);
@@ -67,8 +69,8 @@ public class ProductService {
         product.setId(id);
         productRepository.save(product);
         return ProductResponse.of(product);
-
     }
+
     public ProductResponse findByIdResponse(Integer id){
         return ProductResponse.of(findById(id));
     }
@@ -101,16 +103,36 @@ public class ProductService {
                 .map(ProductResponse::of)
                 .collect(Collectors.toList());
     }
-    public List<ProductResponse> findByCategoryId(String name){
-        if(isEmpty(name)){
+    public List<ProductResponse> findByDescriptionIgnoreCaseContaining(String categoryName){
+        if(isEmpty(categoryName)){
             throw new ValidationException("The Product Category ID name must be informed");
         }
         return productRepository
-                .findByNameIgnoreCaseContaining(name)
+                .findByNameIgnoreCaseContaining(categoryName)
                 .stream()
                 .map(ProductResponse::of)
                 .collect(Collectors.toList());
     }
+    public List<ProductResponse> findByCategoryId(Integer categoryId){
+        if(isEmpty(categoryId)){
+            throw new ValidationException("The Product Category ID name must be informed");
+        }
+        return productRepository
+                .findByCategoryId(categoryId)
+                .stream()
+                .map(ProductResponse::of)
+                .collect(Collectors.toList());
+    }
+//    public List<ProductResponse> findByCategoryId(Integer categoryId){
+//        if(isEmpty(categoryId)){
+//            throw new ValidationException("The Product Category ID name must be informed");
+//        }
+//        return productRepository
+//                .findByCategoryId(categoryId)
+//                .stream()
+//                .map(ProductResponse::of)
+//                .collect(Collectors.toList());
+//    }
 
     private void validateCategoryAndSupplierInformed(ProductRequest request){
         if(isEmpty(request.getCategoryId())){

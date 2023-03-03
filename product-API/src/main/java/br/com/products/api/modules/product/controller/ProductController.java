@@ -45,11 +45,16 @@ public class ProductController {
     public List<ProductResponse> findBySupplierId (@PathVariable Integer id){
         return productService.findBySupplierId(id);
     }
-
-    @GetMapping("/{name}")
-    public List<ProductResponse> findByNameCategory (@PathVariable String name){
-        return productService.findByCategoryId(name);
+    @GetMapping("categoryId/{id}")
+    public List<ProductResponse> findByCategoryId (@PathVariable Integer id){
+        return productService.findByCategoryId(id);
     }
+
+    @GetMapping("categoryName/{name}")
+    public List<ProductResponse> findByNameCategory (@PathVariable String name){
+        return productService.findByDescriptionIgnoreCaseContaining(name);
+    }
+
 
     @DeleteMapping("{id}")
     public SuccessResponse deleteById(@PathVariable Integer id){

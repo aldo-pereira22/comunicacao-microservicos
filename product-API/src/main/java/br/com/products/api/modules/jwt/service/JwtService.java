@@ -14,46 +14,48 @@ import static org.springframework.util.ObjectUtils.isEmpty;
 @Service
 public class JwtService {
 
-    private static final String BEARER = "bearer";
+    private static final String EMPTY_SPACE = " ";
+    private static final Integer TOKEN_INDEX  = 1;
 
+    private static final String BEARER = "bearer ";
+
+//    @Value("${app-config.secrets.api-secret}")
     @Value("${app-config.secrets.api-secret}")
     private String apiSecret;
 
     public void validateAuthorization(String token){
+
         try{
             var accessToken = extractToken(token);
             var claims = Jwts.parserBuilder()
+//                    .setSigningKey(Keys.hmacShaKeyFor(apiSecret.getBytes()))
                     .setSigningKey(Keys.hmacShaKeyFor(apiSecret.getBytes()))
                     .build()
                     .parseClaimsJws(accessToken)
                     .getBody();
             var user = JwtResponse.getUser(claims);
-            if(!isEmpty(user) || isEmpty(user.getId())){
+            if(isEmpty(user) || isEmpty(user.getId())){
                 throw  new AuthenticationException("The user is not valid");
             }
         }catch (Exception ex){
             ex.printStackTrace();
-            try {
-                throw new AuthenticationException("Error while trying to proccess the Access token" );
-            } catch (AuthenticationException e) {
-                throw new RuntimeException(e);
-            }
         }
     }
 
-    private String extractToken(String token){
+    private String extractToken(String token)  {
         if(isEmpty(token)){
             try {
-                throw new AuthenticationException("The access token was not informed");
+                throw new AuthenticationException("The access token was not informed!");
             } catch (AuthenticationException e) {
                 throw new RuntimeException(e);
             }
         }
 
-        if(token.toLowerCase().contains(BEARER)){
-            token = token.toLowerCase();
-            token = token.replace(BEARER, Strings.EMPTY);
-        }
+        if(token.contains(EMPTY_SPACE)){
+            return token.split(EMPTY_SPACE)[TOKEN_INDEX];
+         }
+
+
         return token;
     }
 

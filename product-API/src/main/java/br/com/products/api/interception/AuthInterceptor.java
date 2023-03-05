@@ -2,6 +2,7 @@ package br.com.products.api.interception;
 
 import br.com.products.api.modules.jwt.service.JwtService;
 import feign.Request;
+import org.apache.tomcat.websocket.AuthenticationException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.servlet.HandlerInterceptor;
 
@@ -15,7 +16,8 @@ public class AuthInterceptor implements HandlerInterceptor {
     @Autowired
     private JwtService jwtService;
 
-    public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler){
+    public boolean preHandle(HttpServletRequest request, HttpServletResponse
+            response, Object handler) throws AuthenticationException {
         if(isOptions(request)){
             return true;
         }

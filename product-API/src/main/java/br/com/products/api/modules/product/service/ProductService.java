@@ -11,9 +11,13 @@ import br.com.products.api.modules.product.dto.ProductResponse;
 import br.com.products.api.modules.product.dto.ProductStockDto;
 import br.com.products.api.modules.product.model.Product;
 import br.com.products.api.modules.product.repository.ProductRepository;
+import br.com.products.api.modules.sales.dto.SalesConfirmationDto;
+import br.com.products.api.modules.sales.enums.SalesStatus;
+import br.com.products.api.modules.sales.rabbitmq.SalesConfirmationSender;
 import br.com.products.api.modules.supplier.dto.SupplierResponse;
 import br.com.products.api.modules.supplier.model.Supplier;
 import br.com.products.api.modules.supplier.service.SupplierService;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.stereotype.Service;
@@ -23,6 +27,7 @@ import java.util.stream.Collectors;
 
 import static org.springframework.util.ObjectUtils.isEmpty;
 
+@Slf4j
 @Service
 public class ProductService {
     private static final Integer ZERO = 0;
@@ -34,6 +39,10 @@ public class ProductService {
 
     @Autowired
     private CategoryService categoryService;
+
+
+    @Autowired
+    private SalesConfirmationSender salesConfirmationSender;
 
     public List<ProductResponse> findAll(){
         return productRepository
@@ -166,7 +175,38 @@ public class ProductService {
     }
 
     public void updateProductStock(ProductStockDto productStockDto){
+        try {
+            validateStockUpdateData(productStockDto);
 
+        }catch (Exception ex){
+            log.error("Error While trying to update stock for message with error: {}", ex.getMessage(), ex);
+            var rejectedMessage = new SalesConfirmationDto(productStockDto.getSalesId(), SalesStatus.REJECT);
+            salesConfirmationSender.sendSalesConfirmationMessage(rejectedMessage);
+
+        }
+    }
+
+    private void validateStockUpdateData(ProductStockDto productStockDto){
+        if(isEmpty(productStockDto)
+        || isEmpty(productStockDto.getSalesId())
+        ){
+            throw new ValidationException("The product data and sales ID must be informed");
+        }
+
+        if(isEmpty(productStockDto.getProducts())){
+            throw new ValidationException("The sales products must be informed");
+        }
+
+        productStockDto
+                .getProducts()
+                .forEach(salesProduct -> {
+                    if (isEmpty(salesProduct.getQuantity())
+                            || isEmpty(salesProduct.getProductId())
+                    ) {
+
+                        throw new ValidationException("The product ID and the quantity must be informed");
+                    }
+                });
     }
 
 }

@@ -8,6 +8,7 @@ import br.com.products.api.modules.category.model.Category;
 import br.com.products.api.modules.category.service.CategoryService;
 import br.com.products.api.modules.product.dto.ProductRequest;
 import br.com.products.api.modules.product.dto.ProductResponse;
+import br.com.products.api.modules.product.dto.ProductStockDto;
 import br.com.products.api.modules.product.model.Product;
 import br.com.products.api.modules.product.repository.ProductRepository;
 import br.com.products.api.modules.supplier.dto.SupplierResponse;
@@ -162,6 +163,10 @@ public class ProductService {
         if (isEmpty(id)) {
             throw new ValidationException("The Supplier ID must informed.");
         }
+    }
+
+    public void updateProductStock(ProductStockDto productStockDto){
+
     }
 
 }

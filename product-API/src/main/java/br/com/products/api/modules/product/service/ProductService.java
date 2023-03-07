@@ -6,6 +6,7 @@ import br.com.products.api.modules.category.dto.CategoryRequest;
 import br.com.products.api.modules.category.dto.CategoryResponse;
 import br.com.products.api.modules.category.model.Category;
 import br.com.products.api.modules.category.service.CategoryService;
+import br.com.products.api.modules.product.dto.ProductQuantityDto;
 import br.com.products.api.modules.product.dto.ProductRequest;
 import br.com.products.api.modules.product.dto.ProductResponse;
 import br.com.products.api.modules.product.dto.ProductStockDto;
@@ -177,7 +178,7 @@ public class ProductService {
     public void updateProductStock(ProductStockDto productStockDto){
         try {
             validateStockUpdateData(productStockDto);
-
+            updateStock(productStockDto);
         }catch (Exception ex){
             log.error("Error While trying to update stock for message with error: {}", ex.getMessage(), ex);
             var rejectedMessage = new SalesConfirmationDto(productStockDto.getSalesId(), SalesStatus.REJECT);
@@ -185,7 +186,18 @@ public class ProductService {
 
         }
     }
-
+    private void updateStock(ProductStockDto productStockDto){
+        productStockDto
+                .getProducts()
+                .forEach(salesProduct -> {
+                    var existingProduct = findById(salesProduct.getProductId());
+                    validateQuantityInStock(salesProduct, existingProduct);
+                    existingProduct.updateStock(salesProduct.getQuantity());
+                    productRepository.save(existingProduct);
+                    var aprovedMessage = new SalesConfirmationDto(productStockDto.getSalesId(), SalesStatus.APPROVED);
+                    salesConfirmationSender.sendSalesConfirmationMessage(aprovedMessage);
+                });
+    }
     private void validateStockUpdateData(ProductStockDto productStockDto){
         if(isEmpty(productStockDto)
         || isEmpty(productStockDto.getSalesId())
@@ -207,6 +219,14 @@ public class ProductService {
                         throw new ValidationException("The product ID and the quantity must be informed");
                     }
                 });
+    }
+
+    private void validateQuantityInStock(ProductQuantityDto salesProduct, Product existingProduct){
+        if(salesProduct.getQuantity() >  existingProduct.getQuantityAvailable()){
+            throw new ValidationException(
+                    String.format("The product %s is out of stock. ", existingProduct.getId())
+            );
+        }
     }
 
 }

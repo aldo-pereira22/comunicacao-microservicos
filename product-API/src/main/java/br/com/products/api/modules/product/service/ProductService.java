@@ -23,6 +23,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.stereotype.Service;
 
+import javax.transaction.Transactional;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -187,17 +189,25 @@ public class ProductService {
         }
     }
     private void updateStock(ProductStockDto productStockDto){
+        List<Product> productStockForUpdate = new ArrayList<>();
+
         productStockDto
                 .getProducts()
                 .forEach(salesProduct -> {
                     var existingProduct = findById(salesProduct.getProductId());
                     validateQuantityInStock(salesProduct, existingProduct);
                     existingProduct.updateStock(salesProduct.getQuantity());
-                    productRepository.save(existingProduct);
-                    var aprovedMessage = new SalesConfirmationDto(productStockDto.getSalesId(), SalesStatus.APPROVED);
-                    salesConfirmationSender.sendSalesConfirmationMessage(aprovedMessage);
+                    productStockForUpdate.add(existingProduct);
                 });
+
+            if(!isEmpty(productStockForUpdate)){
+                productRepository.saveAll(productStockForUpdate);
+                var aprovedMessage = new SalesConfirmationDto(productStockDto.getSalesId(), SalesStatus.APPROVED);
+                salesConfirmationSender.sendSalesConfirmationMessage(aprovedMessage);
+            }
     }
+
+    @Transactional
     private void validateStockUpdateData(ProductStockDto productStockDto){
         if(isEmpty(productStockDto)
         || isEmpty(productStockDto.getSalesId())

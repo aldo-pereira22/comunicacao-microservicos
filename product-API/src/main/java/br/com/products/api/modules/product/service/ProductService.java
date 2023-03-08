@@ -246,4 +246,24 @@ public class ProductService {
             throw new ValidationException("There was an error trying to get the product's sales");
         }
     }
+
+    public  SuccessResponse checkProductsStock(ProductCheckStockRequest request){
+        if(isEmpty(request) || isEmpty(request.getProducts())){
+            throw new ValidationException("The request data must be informed!");
+        }
+        request
+                .getProducts()
+                .forEach(this::validateStock);
+        return  SuccessResponse.create("The stock is ok!");
+    }
+
+    public void validateStock(ProductQuantityDto productQuantityDto){
+        if(isEmpty(productQuantityDto.getProductId()) || isEmpty(productQuantityDto.getQuantity())){
+            throw new ValidationException("Product ID and quantity must be informed!");
+        }
+        var product = findById(productQuantityDto.getProductId());
+        if(productQuantityDto.getQuantity() > product.getQuantityAvailable()  ){
+            throw new ValidationException(String.format(" The product %s is out of stock.", product.getId()));
+        }
+    }
 }

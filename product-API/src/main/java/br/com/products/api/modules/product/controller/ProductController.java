@@ -1,9 +1,7 @@
 package br.com.products.api.modules.product.controller;
 
 import br.com.products.api.config.exception.SuccessResponse;
-import br.com.products.api.modules.product.dto.ProductRequest;
-import br.com.products.api.modules.product.dto.ProductResponse;
-import br.com.products.api.modules.product.dto.ProductSalesResponse;
+import br.com.products.api.modules.product.dto.*;
 import br.com.products.api.modules.product.service.ProductService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -62,6 +60,10 @@ public class ProductController {
         return productService.update(request, id);
     }
 
+    @PostMapping("check-stock")
+    public SuccessResponse checkProductStock(@RequestBody ProductCheckStockRequest request){
+        return  productService.checkProductsStock(request);
+    }
 
     @GetMapping("{id}/sales")
     public ProductSalesResponse findProductIdSales(@PathVariable Integer id){

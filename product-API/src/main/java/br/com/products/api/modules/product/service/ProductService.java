@@ -2,25 +2,17 @@ package br.com.products.api.modules.product.service;
 
 import br.com.products.api.config.exception.SuccessResponse;
 import br.com.products.api.config.exception.ValidationException;
-import br.com.products.api.modules.category.dto.CategoryRequest;
-import br.com.products.api.modules.category.dto.CategoryResponse;
-import br.com.products.api.modules.category.model.Category;
 import br.com.products.api.modules.category.service.CategoryService;
-import br.com.products.api.modules.product.dto.ProductQuantityDto;
-import br.com.products.api.modules.product.dto.ProductRequest;
-import br.com.products.api.modules.product.dto.ProductResponse;
-import br.com.products.api.modules.product.dto.ProductStockDto;
+import br.com.products.api.modules.product.dto.*;
 import br.com.products.api.modules.product.model.Product;
 import br.com.products.api.modules.product.repository.ProductRepository;
+import br.com.products.api.modules.sales.client.SalesClient;
 import br.com.products.api.modules.sales.dto.SalesConfirmationDto;
 import br.com.products.api.modules.sales.enums.SalesStatus;
 import br.com.products.api.modules.sales.rabbitmq.SalesConfirmationSender;
-import br.com.products.api.modules.supplier.dto.SupplierResponse;
-import br.com.products.api.modules.supplier.model.Supplier;
 import br.com.products.api.modules.supplier.service.SupplierService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
@@ -42,6 +34,9 @@ public class ProductService {
 
     @Autowired
     private CategoryService categoryService;
+
+    @Autowired
+    private SalesClient salesClient;
 
 
     @Autowired
@@ -239,4 +234,16 @@ public class ProductService {
         }
     }
 
+   public ProductSalesResponse findProductSales(Integer id){
+        var product = findById(id);
+
+        try {
+            var sales = salesClient.findSalesByProductId(product.getId()).orElseThrow(
+                    () -> new ValidationException("The sales was not found by this product.")
+            );
+            return ProductSalesResponse.of(product, sales.getSalesId());
+        }catch (Exception ex){
+            throw new ValidationException("There was an error trying to get the product's sales");
+        }
+    }
 }

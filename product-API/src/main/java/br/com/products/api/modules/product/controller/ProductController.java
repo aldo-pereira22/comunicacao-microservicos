@@ -1,14 +1,10 @@
 package br.com.products.api.modules.product.controller;
 
 import br.com.products.api.config.exception.SuccessResponse;
-import br.com.products.api.modules.category.dto.CategoryRequest;
-import br.com.products.api.modules.category.dto.CategoryResponse;
-import br.com.products.api.modules.category.service.CategoryService;
 import br.com.products.api.modules.product.dto.ProductRequest;
 import br.com.products.api.modules.product.dto.ProductResponse;
-import br.com.products.api.modules.product.model.Product;
+import br.com.products.api.modules.product.dto.ProductSalesResponse;
 import br.com.products.api.modules.product.service.ProductService;
-import br.com.products.api.modules.supplier.dto.SupplierResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -65,4 +61,11 @@ public class ProductController {
     public ProductResponse update(@RequestBody ProductRequest request, @PathVariable Integer id){
         return productService.update(request, id);
     }
+
+
+    @GetMapping("{id}/sales")
+    public ProductSalesResponse findProductIdSales(@PathVariable Integer id){
+        return productService.findProductSales(id);
+    }
+
 }

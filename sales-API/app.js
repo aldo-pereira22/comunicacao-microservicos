@@ -1,17 +1,20 @@
 import  expres  from "express";
 import {connect} from './src/config/db/mongodbConfig.js'
 import { createInitialData } from "./src/config/db/initialData.js"; 
+import checkToken from "./src/config/auth/checkToken.js";
+
 
 const app = expres()
 const env = process.env;
 
 const PORT = env.PORT || 8083
 
+
 connect()
 createInitialData()
+app.use(checkToken)
 app.get('/api/status', async (req, res) => {
 
-    console.log("DBB: ", teste)
     return res.status(200).json({
         service: "Sales - API",
         status: "UP",

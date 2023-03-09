@@ -1,7 +1,8 @@
 import  expres  from "express";
-import {connect} from './src/config/db/mongodbConfig.js'
+import {connectMonogDb} from './src/config/db/mongodbConfig.js'
 import { createInitialData } from "./src/config/db/initialData.js"; 
 import checkToken from "./src/config/auth/checkToken.js";
+import { connectRabbitMq } from "./src/config/rabbitma/rabbitConfig.js";
 
 
 const app = expres()
@@ -10,8 +11,9 @@ const env = process.env;
 const PORT = env.PORT || 8083
 
 
-connect()
+connectMonogDb()
 createInitialData()
+connectRabbitMq()
 app.use(checkToken)
 app.get('/api/status', async (req, res) => {
 

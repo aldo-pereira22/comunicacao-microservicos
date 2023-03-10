@@ -1,4 +1,6 @@
 import amqp from "amqplib/callback_api.js"
+import { listenToSalesConfirmationQueue } from '../../modules/sales/rabbitmq/salesConfirmationListener.js'
+
 import { RABBIT_MQ_URL } from "../constants/secrets.js"
 import {
     PRODUCT_TOPIC,
@@ -27,7 +29,7 @@ export async function connectRabbitMq(){
   }
 }
     async function conectRabittMqAndCreateQueues(){
-            amqp.connect(RABBIT_MQ_URL, (error, connection) => {
+    amqp.connect(RABBIT_MQ_URL, (error, connection) => {
         if(error){
             throw new error
         }
@@ -38,7 +40,12 @@ export async function connectRabbitMq(){
         setTimeout(() => {
             connection.close()
         }, HALF_SECOND)
+      
     })  
+    setTimeout(() => {
+        listenToSalesConfirmationQueue()
+
+    }, HALF_SECOND)
     }
 
     function createQueue(connection, queue, routingKey, topic){

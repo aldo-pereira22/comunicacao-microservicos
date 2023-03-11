@@ -1,4 +1,6 @@
+import { BAD_REQUEST } from "../../../config/constants/httpStatus.js";
 import { sendMessageToProductStockUpdateQueue } from "../../product/rabbitmq/productStockUpdateSender.js";
+import Order from "../model/Order.js";
 import OrderRepository from "../repository/OrderRepository.js";
 import { PENDING, REJECTED, ACCEPTED } from "../status/OrderStatus.js";
 
@@ -17,7 +19,9 @@ class OrderService{
                 products: orderData
 
             }
+            await this.validateProductStock(order)
             let createOrder = await OrderRepository.save(order)
+            sendMessageToProductStockUpdateQueue(createOrder.products)
             return {
                 status: httpStatus.SUCCESS,
                 createOrder
@@ -31,12 +35,40 @@ class OrderService{
             }
         }
     }
+    async updateOrder(orderMessage){
+        try {
+            const order =JSON.parse(orderMessage)
+            if(!order.salesId && !order.status){
+                let existingOrder = await OrderRepository.findById(order.salesId)
+                if(existingOrder && order.status !== existingOrder.status){
+                    existingOrder.status = order.status
+                    await OrderRepository.save(existingOrder)
+                }
     
+            }else {
+                console.warn("The order message was not complete")
+            }
+
+        } catch (error) {
+            console.error("Could not parse order message from queue")
+            console.error(error.message)
+        }
+    }
     validateOrderData(data){
         if(!data || data.products){
             throw new OrderException(BAD_REQUEST, 'The products must be informed')
         }
     }
+
+   async validateProductStock(order){
+        let stockIsOut = true
+        if(stockIsOut){
+            throw new OrderException(BAD_REQUEST,
+                'The stock is out for the products')
+        }
+    }
 }
+
+
 
 export default new OrderService

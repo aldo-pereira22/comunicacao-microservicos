@@ -3,7 +3,7 @@ import { RABBIT_MQ_URL } from "../../../config/constants/secrets.js"
 
 import {
     SALES_CONFIRMATION_QUEUE,
-} from "../../../config/rabbitma/queue.js"
+} from "../../../config/rabbitmq/queue.js"
 
 
 export function listenToSalesConfirmationQueue(){

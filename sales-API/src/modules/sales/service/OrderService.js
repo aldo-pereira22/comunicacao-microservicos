@@ -9,16 +9,10 @@ class OrderService{
     async createOrder(req){
         try {
             let orderData = req.body
-            const {authUser} = req
             this.validateOrderData(orderData)
-            let order = {
-                status: PENDING,
-                user: authUser,
-                createdAt: new Date(),
-                updatedAt: new Date(),
-                products: orderData
-
-            }
+            const {authUser} = req
+            const {Authorization} = req.headers
+            let order = this.createInitailData(orderData, authUser)
             await this.validateProductStock(order)
             let createOrder = await OrderRepository.save(order)
             sendMessageToProductStockUpdateQueue(createOrder.products)
@@ -65,6 +59,17 @@ class OrderService{
         if(stockIsOut){
             throw new OrderException(BAD_REQUEST,
                 'The stock is out for the products')
+        }
+    }
+
+
+    createInitailData(orderData, authUser){
+        return {
+            status: PENDING,
+            user: authUser,
+            createdAt: new Date(),
+            updatedAt: new Date(),
+            products: orderData
         }
     }
 }

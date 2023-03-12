@@ -1,4 +1,5 @@
 import { BAD_REQUEST } from "../../../config/constants/httpStatus.js";
+import ProductClient from "../../product/client/ProductClient.js";
 import { sendMessageToProductStockUpdateQueue } from "../../product/rabbitmq/productStockUpdateSender.js";
 import Order from "../model/Order.js";
 import OrderRepository from "../repository/OrderRepository.js";
@@ -11,11 +12,11 @@ class OrderService{
             let orderData = req.body
             this.validateOrderData(orderData)
             const {authUser} = req
-            const {Authorization} = req.headers
+            const {authorization} = req.headers
             let order = this.createInitailData(orderData, authUser)
-            await this.validateProductStock(order)
+            await this.validateProductStock(order, authorization)
             let createOrder = await OrderRepository.save(order)
-            sendMessageToProductStockUpdateQueue(createOrder.products)
+            this.sendMessage(createOrder)
             return {
                 status: httpStatus.SUCCESS,
                 createOrder
@@ -36,6 +37,7 @@ class OrderService{
                 let existingOrder = await OrderRepository.findById(order.salesId)
                 if(existingOrder && order.status !== existingOrder.status){
                     existingOrder.status = order.status
+                    existingOrder.updatedAt = new  Date()
                     await OrderRepository.save(existingOrder)
                 }
     
@@ -54,8 +56,8 @@ class OrderService{
         }
     }
 
-   async validateProductStock(order){
-        let stockIsOut = true
+   async validateProductStock(order, token){
+        let stockIsOut = await ProductClient.checkProductStock(order.products,token)
         if(stockIsOut){
             throw new OrderException(BAD_REQUEST,
                 'The stock is out for the products')
@@ -71,6 +73,15 @@ class OrderService{
             updatedAt: new Date(),
             products: orderData
         }
+    }
+
+    sendMessage(createOrder){
+        const message = {
+            salesId: createOrder.id,
+            products: createOrder.products
+        }
+        sendMessageToProductStockUpdateQueue(message)
+
     }
 }
 

@@ -1,7 +1,9 @@
-import { BAD_REQUEST } from "../../../config/constants/httpStatus.js";
+import { BAD_REQUEST, INTERNAL_SERVER_ERROR, SUCCESS } from "../../../config/constants/httpStatus.js";
 import ProductClient from "../../product/client/ProductClient.js";
 import { sendMessageToProductStockUpdateQueue } from "../../product/rabbitmq/productStockUpdateSender.js";
-import Order from "../model/Order.js";
+import OrderException from "../exception/OrderException.js";
+
+
 import OrderRepository from "../repository/OrderRepository.js";
 import { PENDING, REJECTED, ACCEPTED } from "../status/OrderStatus.js";
 
@@ -10,24 +12,25 @@ class OrderService{
     async createOrder(req){
         try {
             let orderData = req.body
-            this.validateOrderData(orderData)
+            this.validateOrderData(orderData)        
             const {authUser} = req
             const {authorization} = req.headers
             let order = this.createInitailData(orderData, authUser)
+           
             await this.validateProductStock(order, authorization)
             let createOrder = await OrderRepository.save(order)
+           
             this.sendMessage(createOrder)
             return {
-                status: httpStatus.SUCCESS,
+                status:SUCCESS,
                 createOrder
             }
         } catch (error) {
+            console.log(error)
             return {
-                status: error.status
-                    ? error.status
-                    : httpStatus.INTERNAL_SERVER_ERROR,
-                message: error.message
-            }
+                status: error.status ? error.status : INTERNAL_SERVER_ERROR,
+                message: error.message,
+              }
         }
     }
     async updateOrder(orderMessage){
@@ -51,8 +54,8 @@ class OrderService{
         }
     }
     validateOrderData(data){
-        if(!data || data.products){
-            throw new OrderException(BAD_REQUEST, 'The products must be informed')
+        if(!data || !data.products){
+            throw new OrderException (BAD_REQUEST, 'The products must be informed')
         }
     }
 
@@ -71,7 +74,7 @@ class OrderService{
             user: authUser,
             createdAt: new Date(),
             updatedAt: new Date(),
-            products: orderData
+            products: orderData.products
         }
     }
 
@@ -82,6 +85,36 @@ class OrderService{
         }
         sendMessageToProductStockUpdateQueue(message)
 
+    }
+
+    async findById(req){
+        try {
+            
+            const {id} = req.params
+            this.validateInformedId(id)
+            const existingOrder = await OrderRepository.findById(id)
+            console.log("OBJETO", existingOrder)
+            if(!existingOrder){
+                throw new OrderException(BAD_REQUEST, "The order was not found")
+            }
+            return {
+                status: SUCCESS,
+                existingOrder
+            }
+        } catch (error) {
+            return {
+                status: error.status ? error.status : INTERNAL_SERVER_ERROR,
+                message: error.message
+            }
+        }
+
+    }
+
+    validateInformedId(id){
+        console.log("IDDD", id)
+        if(!id){
+            throw new OrderException(BAD_REQUEST, "THE ORDER ID MUST BE INFORMED!")
+        }
     }
 }
 

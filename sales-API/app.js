@@ -17,6 +17,7 @@ const PORT = env.PORT || 8083
 connectMonogDb()
 createInitialData()
 connectRabbitMq()
+app.use(expres.json())
 app.use(checkToken)
 app.use(orderRouter)
 app.get('/teste', (req, res) => {

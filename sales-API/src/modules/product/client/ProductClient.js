@@ -1,6 +1,5 @@
 import axios from "axios";
-import { BAD_REQUEST } from "../../../config/constants/httpStatus";
-import { PRODUCT_API_URL } from "../../../config/constants/secrets";
+import { PRODUCT_API_URL } from "../../../config/constants/secrets.js";
 
 class ProductClient {
     async checkProductStock(products, token){

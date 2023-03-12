@@ -4,6 +4,7 @@ import { createInitialData } from "./src/config/db/initialData.js";
 import checkToken from "./src/config/auth/checkToken.js";
 import { connectRabbitMq } from "./src/config/rabbitmq/rabbitConfig.js";
 import { sendMessageToProductStockUpdateQueue } from './src/modules/product/rabbitmq/productStockUpdateSender.js'
+import orderRouter from "./src/modules/sales/routes/OrderRoutes.js";
 
 
 
@@ -16,7 +17,8 @@ const PORT = env.PORT || 8083
 connectMonogDb()
 createInitialData()
 connectRabbitMq()
-// app.use(checkToken)
+app.use(checkToken)
+app.use(orderRouter)
 app.get('/teste', (req, res) => {
     try {
         sendMessageToProductStockUpdateQueue([

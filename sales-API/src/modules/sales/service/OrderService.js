@@ -12,19 +12,26 @@ class OrderService{
     async createOrder(req){
         try {
             let orderData = req.body
+
+            const {transactionid, serviceid} = req.headers
+            console.info(`Request to POST new order data with data ${JSON.stringify(orderData)} | [TrasactionID: ${transactionid} | serviceID: ${serviceid}]\n\n\n`)
+
+            
             this.validateOrderData(orderData)        
             const {authUser} = req
             const {authorization} = req.headers
             let order = this.createInitailData(orderData, authUser)
-           
-            await this.validateProductStock(order, authorization)
+            await this.validateProductStock(order, authorization,transactionid)
             let createOrder = await OrderRepository.save(order)
            
             this.sendMessage(createOrder)
-            return {
+           
+            let response = {
                 status:SUCCESS,
                 createOrder
             }
+            console.info(`Request to POST LOGIN with data ${JSON.stringify(response)} | [TrasactionID: ${transactionid} | serviceID: ${serviceid}]`)
+            return response
         } catch (error) {
             console.log(error)
             return {
@@ -59,8 +66,9 @@ class OrderService{
         }
     }
 
-   async validateProductStock(order, token){
-        let stockIsOut = await ProductClient.checkProductStock(order.products,token)
+   async validateProductStock(order, token, transactionid){
+
+        let stockIsOut = await ProductClient.checkProductStock(order.products,token, transactionid)
         if(stockIsOut){
             throw new OrderException(BAD_REQUEST,
                 'The stock is out for the products')
@@ -91,16 +99,22 @@ class OrderService{
         try {
             
             const {id} = req.params
+            const {transactionid, serviceid} = req.headers
+            console.info(`Request to GET ORDER by id ${id} | [TrasactionID: ${transactionid} | serviceID: ${serviceid}]`)
             this.validateInformedId(id)
             const existingOrder = await OrderRepository.findById(id)
 
             if(!existingOrder){
                 throw new OrderException(BAD_REQUEST, "The order was not found")
             }
-            return {
+            let response =  {
                 status: SUCCESS,
                 existingOrder
             }
+            console.info(`Response to GET ORDER by id ${id} : ${JSON.stringify(response)}
+            | [TrasactionID: ${transactionid} | serviceID: ${serviceid}]`)
+
+            return response
         } catch (error) {
             return {
                 status: error.status ? error.status : INTERNAL_SERVER_ERROR,
@@ -111,15 +125,18 @@ class OrderService{
     }
     async findAll(){
         try {
-
+            const {transactionid, serviceid} = req.headers
+            console.info(`Request to GET ALL ORDERS | [TrasactionID: ${transactionid} | serviceID: ${serviceid}]`)
             const orders = await OrderRepository.findAll()
             if(!orders){
                 throw new OrderException(BAD_REQUEST, "No orders were found")
             }
-            return {
+            let response = {
                 status: SUCCESS,
                 orders,
             }
+            console.info(`Response to GET ALL ORDERS | [TrasactionID: ${transactionid} | serviceID: ${serviceid}]`)
+            return response
         } catch (error) {
             return {
                 status: error.status ? error.status : INTERNAL_SERVER_ERROR,
@@ -133,17 +150,29 @@ class OrderService{
         try {
             
             const productId = req.params
+            const {transactionid, serviceid} = req.headers
+
+            console.info(`Request to GET ORDER by productID: ${productId}| [TrasactionID: ${transactionid} | serviceID: ${serviceid}]`)
+            
             this.validateInformedProductId(productId)
             const orders = await OrderRepository.findByProductId(productId.id)
+            console.log("ORDERS", orders)
             if(!orders){
                 throw new OrderException(BAD_REQUEST, "No orders were found")
             }
-            return {
+            let response = {
                 status: SUCCESS,
                 salesId:orders.map(order => {
                     return order.id
                 }),
             }
+            console.info(`
+                Response to GET order by productId ${productId} :${JSON.stringify(response)} | transaction ID ${transactionid}
+                
+                | [transaction id: ${transactionid} | serviceID: ${serviceid} ]
+            `)
+
+            return response
         } catch (error) {
             return {
                 status: error.status ? error.status : INTERNAL_SERVER_ERROR,

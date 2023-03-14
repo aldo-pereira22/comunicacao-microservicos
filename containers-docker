@@ -36,6 +36,13 @@
 	- Criar container de AUTH-API: docker run --name auth-api_container -p 8080:8080 auth-api_image 
 	- Criar container de SALES-API: docker run --name sales-api_container -p 8082:8082 sales-api_image 
 	- Criar container de PRODUCT-API: docker run --name product-api_container -p 8081:8081 product-api_image 
+	
+	
+
+
+##RODAR OS PROJETOS
+	- Iniciar o Rabbit_mq - docker start sales_rabbit
+	- Iniciar o Mongo DB  - docker start sales_mongodb
 
 	
 	

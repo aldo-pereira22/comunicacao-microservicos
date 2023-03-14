@@ -236,7 +236,6 @@ public class ProductService {
 
    public ProductSalesResponse findProductSales(Integer id){
         var product = findById(id);
-
         try {
             var sales = salesClient.findSalesByProductId(product.getId()).orElseThrow(
                     () -> new ValidationException("The sales was not found by this product.")

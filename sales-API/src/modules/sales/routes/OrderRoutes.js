@@ -5,7 +5,10 @@ const router = new Router()
 
 
 router.get("/api/order/:id", OrderController.findById)
+router.get("/api/orders", OrderController.findAll)
+router.get("/api/orders/products/:id", OrderController.findByProductId)
 router.post("/api/order/create", OrderController.createOrder)
+
 
 
 export default router

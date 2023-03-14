@@ -93,7 +93,7 @@ class OrderService{
             const {id} = req.params
             this.validateInformedId(id)
             const existingOrder = await OrderRepository.findById(id)
-            console.log("OBJETO", existingOrder)
+
             if(!existingOrder){
                 throw new OrderException(BAD_REQUEST, "The order was not found")
             }
@@ -109,11 +109,60 @@ class OrderService{
         }
 
     }
+    async findAll(){
+        try {
+
+            const orders = await OrderRepository.findAll()
+            if(!orders){
+                throw new OrderException(BAD_REQUEST, "No orders were found")
+            }
+            return {
+                status: SUCCESS,
+                orders,
+            }
+        } catch (error) {
+            return {
+                status: error.status ? error.status : INTERNAL_SERVER_ERROR,
+                message: error.message
+            }
+        }
+
+    }
+
+    async findbyProductId(req){
+        try {
+            
+            const productId = req.params
+            this.validateInformedProductId(productId)
+            const orders = await OrderRepository.findByProductId(productId.id)
+            if(!orders){
+                throw new OrderException(BAD_REQUEST, "No orders were found")
+            }
+            return {
+                status: SUCCESS,
+                salesId:orders.map(order => {
+                    return order.id
+                }),
+            }
+        } catch (error) {
+            return {
+                status: error.status ? error.status : INTERNAL_SERVER_ERROR,
+                message: error.message
+            }
+        }
+
+    }
 
     validateInformedId(id){
-        console.log("IDDD", id)
+  
         if(!id){
             throw new OrderException(BAD_REQUEST, "THE ORDER ID MUST BE INFORMED!")
+        }
+    }
+    validateInformedProductId(id){
+
+        if(!id){
+            throw new OrderException(BAD_REQUEST, "The order's productId must be informed")
         }
     }
 }

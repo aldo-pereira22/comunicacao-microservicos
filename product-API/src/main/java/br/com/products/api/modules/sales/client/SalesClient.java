@@ -4,6 +4,7 @@ import br.com.products.api.modules.sales.dto.SalesProductResponse;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.util.Optional;
 
@@ -12,7 +13,9 @@ import java.util.Optional;
         contextId = "salesClient",
         url = "${app-config.services.sales}"
 )
+
+@RestController
 public interface SalesClient {
-    @GetMapping("products/{productsid}")
+    @GetMapping("/api/orders/products/{productId}")
     Optional<SalesProductResponse> findSalesByProductId(@PathVariable Integer productId);
 }

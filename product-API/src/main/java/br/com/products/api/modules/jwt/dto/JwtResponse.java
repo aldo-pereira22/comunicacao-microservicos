@@ -17,7 +17,6 @@ public class JwtResponse {
 
 
     public static JwtResponse getUser(Claims jwtClaims){
-        System.out.println("\n\n\nUSUÀRIO: "+jwtClaims.get("authUser"));
         try {
             return new ObjectMapper().convertValue(jwtClaims.get("authUser"), JwtResponse.class);
 

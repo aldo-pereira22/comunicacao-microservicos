@@ -11,5 +11,5 @@ import lombok.NoArgsConstructor;
 public class SalesConfirmationDto {
     private String salesId;
     private SalesStatus salesStatus;
-
+    private String transactionid;
 }

@@ -14,5 +14,6 @@ public class ProductStockDto implements Serializable {
 
     private String salesId;
     private List<ProductQuantityDto> products;
+    private String transactinid;
 
 }

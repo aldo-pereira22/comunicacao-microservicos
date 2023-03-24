@@ -126,8 +126,10 @@ class OrderService{
         }
 
     }
-    async findAll(){
+    async findAll(req){
+       
         try {
+            console.log("req.headers: ",req.headers)
             const {transactionid, serviceid} = req.headers
             console.info(`Request to GET ALL ORDERS | [TrasactionID: ${transactionid} | serviceID: ${serviceid}]`)
             const orders = await OrderRepository.findAll()

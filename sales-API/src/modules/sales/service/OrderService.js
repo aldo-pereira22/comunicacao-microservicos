@@ -20,11 +20,11 @@ class OrderService{
             this.validateOrderData(orderData)        
             const {authUser} = req
             const {authorization} = req.headers
-            let order = this.createInitailData(orderData, authUser)
+            let order = this.createInitailData(orderData, authUser, transactionid,serviceid)
             await this.validateProductStock(order, authorization,transactionid)
             let createOrder = await OrderRepository.save(order)
            
-            this.sendMessage(createOrder)
+            this.sendMessage(createOrder, transactionid)
            
             let response = {
                 status:SUCCESS,
@@ -52,7 +52,7 @@ class OrderService{
                 }
     
             }else {
-                console.warn("The order message was not complete")
+                console.warn(`The order message was not complete. TRANSACTION ID ${orderMessage.transactionid}`)
             }
 
         } catch (error) {
@@ -76,20 +76,23 @@ class OrderService{
     }
 
 
-    createInitailData(orderData, authUser){
+    createInitailData(orderData, authUser, transactionid,serviceid){
         return {
             status: PENDING,
             user: authUser,
             createdAt: new Date(),
             updatedAt: new Date(),
+            transactionid,
+            serviceid,
             products: orderData.products
         }
     }
 
-    sendMessage(createOrder){
+    sendMessage(createOrder, transactionid){
         const message = {
             salesId: createOrder.id,
-            products: createOrder.products
+            products: createOrder.products,
+            transactionid: transactionid
         }
         sendMessageToProductStockUpdateQueue(message)
 

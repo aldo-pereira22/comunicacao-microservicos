@@ -10,3 +10,6 @@
 
 ### MongoDB
   - Autentciação Jwt
+
+### Docker
+  - Docker para a criação dos banco de dados independentes.
